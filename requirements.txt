@@ -45,7 +45,6 @@ PySocks
 python-dateutil
 python-dotenv
 pytz
-pytz-deprecation-shim.post0
 pyxlsb
 requests
 rich
