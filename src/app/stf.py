@@ -37,6 +37,12 @@ class Stf(Bot):
                     faz_log_st(f'Quantidade de Processos {qtd_processos}')
 
                     processos_pagination = True
+                    
+                    for i in range(20):
+                        self.DRIVER.find_element(By.CSS_SELECTOR, 'body').send_keys(Keys.PAGE_DOWN)
+                    for i in range(20):
+                        self.DRIVER.find_element(By.CSS_SELECTOR, 'body').send_keys(Keys.PAGE_UP)
+
 
                     processos = espera_e_retorna_lista_de_elementos(self.WDW, (By.CSS_SELECTOR, '#card_processos>div'))
                     while processos_pagination:
@@ -59,7 +65,7 @@ class Stf(Bot):
                             self.publicidade_col.append(publicidade)
                             self.tramite_col.append(tramite)
                         else:
-                            for i in range(10):
+                            for i in range(20):
                                 self.DRIVER.find_element(By.CSS_SELECTOR, 'body').send_keys(Keys.PAGE_DOWN)
 
                             botao_next_ativo = espera_e_retorna_conteudo_do_atributo_do_elemento_text(self.WDW, 'class', (By.CSS_SELECTOR, '#item-proxima-pagina'))
@@ -74,6 +80,8 @@ class Stf(Bot):
                         
                     # -- RECUPERA OS DADOS -- #
                 except (TimeoutException, NoSuchElementException):
+                    faz_log_st(self.DRIVER.get_screenshot_as_base64())
+                    faz_log_st(self.DRIVER.page_source)
                     faz_log_st('Não existe processos para a parte - ou o site está fora do ar...')
                     self.identificacao_col.append('Não existe processos para a parte - ou o site está fora do ar...')
                     self.num_unico_col.append('Não existe processos para a parte - ou o site está fora do ar...')
@@ -82,6 +90,10 @@ class Stf(Bot):
                     self.meio_col.append('Não existe processos para a parte - ou o site está fora do ar...')
                     self.publicidade_col.append('Não existe processos para a parte - ou o site está fora do ar...')
                     self.tramite_col.append('Não existe processos para a parte - ou o site está fora do ar...')
+                except Exception as e:
+                    faz_log_st(self.DRIVER.get_screenshot_as_base64())
+                    faz_log_st(self.DRIVER.page_source)
+                    st.exception(e) 
         if isinstance(self.PARTES, str):
             parte = self.PARTES
             faz_log_st(f'Pesquisando pela parte {parte}')
@@ -98,6 +110,12 @@ class Stf(Bot):
                 faz_log_st(f'Quantidade de Processos {qtd_processos}')
 
                 processos_pagination = True
+
+                for i in range(20):
+                    self.DRIVER.find_element(By.CSS_SELECTOR, 'body').send_keys(Keys.PAGE_DOWN)
+                for i in range(20):
+                    self.DRIVER.find_element(By.CSS_SELECTOR, 'body').send_keys(Keys.PAGE_UP)
+
 
                 processos = espera_e_retorna_lista_de_elementos(self.WDW, (By.CSS_SELECTOR, '#card_processos>div'))
                 while processos_pagination:
@@ -120,7 +138,7 @@ class Stf(Bot):
                         self.tramite_col.append(tramite)
                     else:
                         faz_log_st('Verificando se tem mais paginas...')
-                        for i in range(10):
+                        for i in range(20):
                             self.DRIVER.find_element(By.CSS_SELECTOR, 'body').send_keys(Keys.PAGE_DOWN)
 
                         botao_next_ativo = espera_e_retorna_conteudo_do_atributo_do_elemento_text(self.WDW, 'class', (By.CSS_SELECTOR, '#item-proxima-pagina'))
@@ -133,6 +151,8 @@ class Stf(Bot):
                             processos_pagination = False
                     # -- RECUPERA OS DADOS -- #
             except (TimeoutException, NoSuchElementException):
+                faz_log_st(self.DRIVER.get_screenshot_as_base64())
+                faz_log_st(self.DRIVER.page_source)
                 faz_log_st('Não existe processos para a parte - ou o site está fora do ar...')
                 self.identificacao_col.append('Não existe processos para a parte - ou o site está fora do ar...')
                 self.num_unico_col.append('Não existe processos para a parte - ou o site está fora do ar...')
@@ -141,6 +161,10 @@ class Stf(Bot):
                 self.meio_col.append('Não existe processos para a parte - ou o site está fora do ar...')
                 self.publicidade_col.append('Não existe processos para a parte - ou o site está fora do ar...')
                 self.tramite_col.append('Não existe processos para a parte - ou o site está fora do ar...')
+            except Exception as e:
+                    faz_log_st(self.DRIVER.get_screenshot_as_base64())
+                    faz_log_st(self.DRIVER.page_source)
+                    st.exception(e) 
         
     def faz_dataframe(self):
         faz_log_st('Fazendo tabela excel...')
