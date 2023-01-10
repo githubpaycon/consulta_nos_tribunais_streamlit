@@ -54,7 +54,7 @@ six
 smmap
 sniffio
 sortedcontainers
-soupsieve.post1
+soupsieve
 streamlit
 tenacity
 toml
