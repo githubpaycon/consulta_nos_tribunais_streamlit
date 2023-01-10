@@ -49,7 +49,7 @@ if CHOICE == 'Extração dos Dados':
 
                 if str_button:
                     with st.expander('Execução do robô...'):
-                        stf = Stf(False, False, parte)
+                        stf = Stf(True, False, parte)
                         stf.executa_bot()
                         st.success('Robô finalizado!')
                     st.success('Robô finalizado!')
