@@ -8,6 +8,19 @@ import plotly.express as px
 
 
 # -- CONFIGURATIONS -- #
+st.set_page_config(
+    page_title="Consulta nos Tribunais",
+    page_icon="⚖️",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+    menu_items={
+        'Get Help': 'https://api.whatsapp.com/send?phone=5511985640273',
+        'Report a bug': "https://api.whatsapp.com/send?phone=5511985640273",
+        'About': "#### Trabalhando por um futuro melhor (e mais automatizado) com muito amor, inteligência e vontade! [Isso é a Paycon Automation](https://payconautomacoes.com.br/)"
+    }
+)
+
+
 st.markdown("""<style type="text/css">
 .p {
     color:red;
