@@ -1,0 +1,15 @@
+*******************************************
+* BEM VINDO AO BOT CONSULTA NOS TRIBUNAIS *
+*******************************************
+
+
+*******************************************************************
+*                          AVISO!                                 *
+*                                                                 *
+* NÃO MINIMIZE A JANELA DURANTE A RECUPERAÇÃO DAS INDENTIFICAÇÕES *
+*                                                                 *
+* SEMPRE DEIXE UMA LINHA A MAIS NO ARQUIVO "partes.txt"           *
+*                                                                 *
+* "S-A" É O MESMO QUE "S/A"                                     *
+*                                                                 *
+*******************************************************************
