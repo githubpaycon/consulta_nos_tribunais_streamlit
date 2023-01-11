@@ -63,9 +63,9 @@ if CHOICE == 'Extração dos Dados':
             st.markdown('<p class="p">* Insira uma parte válida!</p>', True)
             parte = st.text_input('Parte:')
             if parte:
-                str_button = st.button('Pesquisar no STF', 'stf')
+                stf_button = st.button('Pesquisar no STF', 'stf')
 
-                if str_button:
+                if stf_button:
                     with st.expander('Execução do robô...'):
                         try:
                             stf = Stf(True, False, parte)
@@ -73,11 +73,13 @@ if CHOICE == 'Extração dos Dados':
                             st.success('Robô finalizado!')
                         except InvalidSessionIdException:
                             st.warning('Ocorreu um erro inesperado, reexecute a pesquisa.')
-
-                    df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
-                    st.download_button(label='📥 Baixar a Extração...',
-                                        data=df_xlsx ,
-                                        file_name= 'extraction.xlsx')
+                    try:
+                        df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
+                        st.download_button(label='📥 Baixar a Extração...',
+                                            data=df_xlsx ,
+                                            file_name= 'extraction.xlsx')
+                    except (FileNotFoundError, FileExistsError):
+                        st.warning('O Robô foi executado, no entanto pode ter ocorrido um erro e não existe a tabela de extração')
         if parte_tipo == 'Várias partes ao mesmo tempo':
             st.markdown('<p class="p">* Insira um arquivo .xlsx com uma coluna <b>PARTES</b> contendo as partes!</p>', True)
             parte = st.file_uploader('Arquivo:', type='xlsx')
@@ -90,18 +92,23 @@ if CHOICE == 'Extração dos Dados':
                         st.markdown(f'<center><b>{part}</b></center>', True)
                         
 
-                    str_button = st.button('Pesquisar no STF', 'stf')
-                    if str_button:
+                    stf_button = st.button('Pesquisar no STF', 'stf')
+                    if stf_button:
                         with st.expander('Execução do robô...'):
-                            stf = Stf(True, False, partes_list.to_list())
-                            stf.executa_bot()
-                            st.success('Robô finalizado!')
-                        st.success('Robô finalizado!')
+                            try:
+                                stf = Stf(True, False, parte)
+                                stf.executa_bot()
+                                st.success('Robô finalizado!')
+                            except InvalidSessionIdException:
+                                st.warning('Ocorreu um erro inesperado, reexecute a pesquisa.')
+                        try:
+                            df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
+                            st.download_button(label='📥 Baixar a Extração...',
+                                                data=df_xlsx ,
+                                                file_name= 'extraction.xlsx')
+                        except (FileNotFoundError, FileExistsError):
+                            st.warning('O Robô foi executado, no entanto pode ter ocorrido um erro e não existe a tabela de extração')
 
-                        df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
-                        st.download_button(label='📥 Baixar a Extração...',
-                                            data=df_xlsx ,
-                                            file_name= 'extraction.xlsx')
                 except KeyError:
                     st.error(f'Não foi encontrada a coluna **PARTES** e sim essa(s): {list(df_partes.columns)}. Remova o arquivo e envie outro com a devida coluna.')
     else:

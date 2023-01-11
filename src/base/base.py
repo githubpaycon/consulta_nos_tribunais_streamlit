@@ -82,7 +82,7 @@ class Bot:
         # self._options.add_argument('–disable-notifications')
         # self._options.add_argument("--window-size=1920,1080")
         
-        self.__service = Service(ChromeDriverManager().install())
+        self.__service = Service(ChromeDriverManager(cache_valid_range=0).install())
         
         # create DRIVER
         self.DRIVER = Chrome(service=self.__service, options=self._options)
