@@ -1,6 +1,7 @@
 import pandas as pd
 from src.app.stf import Stf
 import streamlit as st
+from src.base.base import InvalidSessionIdException
 import os
 from funcsforspo_l.fpython.functions_for_py import *
 from src.utils.utils import to_excel_for_download_button, verifica_colunas_stf
@@ -42,6 +43,10 @@ except FileNotFoundError:
 
 # -- CONFIGURATIONS -- #
 
+
+# ================================ #
+# ====== EXTRAÇÃO DOS DADOS ====== #
+# ================================ #
 if CHOICE == 'Extração dos Dados':
     st.markdown('# Consulta nos Tribunais')
     st.markdown('### Faça consultas nos principais tribunais do Brasil!')
@@ -62,10 +67,12 @@ if CHOICE == 'Extração dos Dados':
 
                 if str_button:
                     with st.expander('Execução do robô...'):
-                        stf = Stf(True, False, parte)
-                        stf.executa_bot()
-                        st.success('Robô finalizado!')
-                    st.success('Robô finalizado!')
+                        try:
+                            stf = Stf(True, False, parte)
+                            stf.executa_bot()
+                            st.success('Robô finalizado!')
+                        except InvalidSessionIdException:
+                            st.warning('Ocorreu um erro inesperado, reexecute a pesquisa.')
 
                     df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
                     st.download_button(label='📥 Baixar a Extração...',
