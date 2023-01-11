@@ -13,6 +13,8 @@ from funcsforspo_l.fpython.functions_for_py import *
 from funcsforspo_l.fselenium.functions_selenium import *
 from funcsforspo_l.fregex.functions_re import *
 from src.exceptions.exceptions import *
+from webdriver_manager.core.utils import ChromeType
+
 import pandas as pd
 import streamlit as st
 import json
@@ -84,7 +86,7 @@ class Bot:
         self._options.add_argument('–disable-notifications')
         self._options.add_argument("--window-size=1920,1080")
         
-        self.__service = Service(ChromeDriverManager(cache_valid_range=0).install())
+        self.__service = Service(ChromeDriverManager(cache_valid_range=0, chrome_typechrome_type=ChromeType.CHROMIUM).install())
         
         # create DRIVER
         self.DRIVER = Chrome(service=self.__service, options=self._options)
