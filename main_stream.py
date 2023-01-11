@@ -8,7 +8,7 @@ from src.utils.utils import to_excel_for_download_button, verifica_colunas_stf
 import plotly.express as px
 
 
-# -- CONFIGURATIONS -- #
+# -- CONFIGURATIONS = START -- #
 st.set_page_config(
     page_title="Consulta nos Tribunais",
     page_icon="⚖️",
@@ -41,7 +41,7 @@ except FileNotFoundError:
     pass
 # -- DELETE EXTRACTION --
 
-# -- CONFIGURATIONS -- #
+# -- CONFIGURATIONS = END-- #
 
 
 # ================================ #
