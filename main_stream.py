@@ -1,5 +1,6 @@
 import pandas as pd
 from src.app.stf import Stf
+from src.app.stj import Stj
 import streamlit as st
 from src.base.base import InvalidSessionIdException
 import os
@@ -11,7 +12,7 @@ import plotly.express as px
 # -- CONFIGURATIONS = START -- #
 st.set_page_config(
     page_title="Consulta nos Tribunais",
-    page_icon="⚖️",
+    page_icon="justice.png",
     layout="wide",
     initial_sidebar_state="collapsed",
     menu_items={
@@ -31,7 +32,7 @@ st.markdown("""<style type="text/css">
 # -- SIDEBAR --
 bar = st.sidebar
 bar.markdown('# Escolha uma ferramenta...')
-CHOICE = bar.selectbox('Escolha uma Ferramenta', ['Extração dos Dados', 'Analise Dos Dados Extraidos'])
+CHOICE = bar.selectbox('Escolha uma Ferramenta', ['Extração dos Dados']) # , 'Analise Dos Dados Extraidos'
 # -- SIDEBAR --
 
 # -- DELETE EXTRACTION --
@@ -47,73 +48,74 @@ except FileNotFoundError:
 # ================================ #
 # ====== EXTRAÇÃO DOS DADOS ====== #
 # ================================ #
+st.image('sucess_logo_paycon.png', width=150)
 if CHOICE == 'Extração dos Dados':
     st.markdown('# Consulta nos Tribunais')
     st.markdown('### Faça consultas nos principais tribunais do Brasil!')
     st.markdown('#### Tribunais disponíveis atualmente:')
     st.markdown('* STF - Supremo Tribunal Federal')
+    st.markdown('* STJ - Superior Tribunal de Justiça')
     st.markdown('---')
-
     tribunal = st.selectbox('Escolha o Tribunal:', ['STF - Supremo Tribunal Federal', 'STJ - Superior Tribunal de Justiça', 'TST - Tribunal Superior do Trabalho'])
 
     if tribunal == 'STF - Supremo Tribunal Federal':
-        parte_tipo = st.radio('Escolha entre as formas de procura:', ['Uma única parte', 'Várias partes ao mesmo tempo'])
-        
-        if parte_tipo == 'Uma única parte':
-            st.markdown('<p class="p">* Insira uma parte válida!</p>', True)
-            parte = st.text_input('Parte:')
-            if parte:
-                stf_button = st.button('Pesquisar no STF', 'stf')
-
-                if stf_button:
-                    with st.expander('Execução do robô...'):
-                        try:
-                            stf = Stf(True, False, parte)
-                            stf.executa_bot()
-                            st.success('Robô finalizado!')
-                        except InvalidSessionIdException:
-                            st.warning('Ocorreu um erro inesperado, reexecute a pesquisa.')
+        st.markdown('<p class="p">* Insira uma parte válida!</p>', True)
+        parte = st.text_input('Parte:').strip()
+        stf_button = st.button('Pesquisar no STF', 'stf')
+        if stf_button:
+            if parte == '':
+                st.warning('Parte não foi preenchida! ☹️')
+            else:
+                with st.expander('Execução do robô...'):
                     try:
-                        df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
-                        st.download_button(label='📥 Baixar a Extração...',
-                                            data=df_xlsx ,
-                                            file_name= 'extraction.xlsx')
-                    except (FileNotFoundError, FileExistsError):
-                        st.warning('O Robô foi executado, no entanto pode ter ocorrido um erro e não existe a tabela de extração')
-        if parte_tipo == 'Várias partes ao mesmo tempo':
-            st.markdown('<p class="p">* Insira um arquivo .xlsx com uma coluna <b>PARTES</b> contendo as partes!</p>', True)
-            parte = st.file_uploader('Arquivo:', type='xlsx')
-            if parte is not None:
-                df_partes =pd.read_excel(parte, 0)
+                        stf = Stf(True, False, parte)
+                        stf.executa_bot()
+                        st.success('Robô finalizado!')
+                    except InvalidSessionIdException:
+                        st.warning('Ocorreu um erro inesperado, reexecute a pesquisa.')
                 try:
-                    partes_list = df_partes['PARTES']
-                    st.markdown('Partes encontradas:')
-                    for part in partes_list:
-                        st.markdown(f'<center><b>{part}</b></center>', True)
-                        
+                    df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
+                    st.download_button(label='📥 Baixar a Extração...',
+                                        data=df_xlsx ,
+                                        file_name= 'extraction.xlsx')
+                except (FileNotFoundError, FileExistsError):
+                    st.warning('O Robô foi executado, no entanto pode ter ocorrido um erro e não existe a tabela de extração')
 
-                    stf_button = st.button('Pesquisar no STF', 'stf')
-                    if stf_button:
-                        with st.expander('Execução do robô...'):
-                            try:
-                                stf = Stf(True, False, parte)
-                                stf.executa_bot()
-                                st.success('Robô finalizado!')
-                            except InvalidSessionIdException:
-                                st.warning('Ocorreu um erro inesperado, reexecute a pesquisa.')
-                        try:
-                            df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
-                            st.download_button(label='📥 Baixar a Extração...',
-                                                data=df_xlsx ,
-                                                file_name= 'extraction.xlsx')
-                        except (FileNotFoundError, FileExistsError):
-                            st.warning('O Robô foi executado, no entanto pode ter ocorrido um erro e não existe a tabela de extração')
+    elif tribunal == 'STJ - Superior Tribunal de Justiça':
+        st.markdown('<p class="p">* Insira uma parte válida!</p>', True)
+        tipo_de_parte = st.multiselect('Gostaria que a parte fosse:', ['Autor', 'Réu', 'Outros...'], default=['Autor', 'Réu', 'Outros...'])
+        parte = st.text_input('Parte:').strip()
+        stj_button = st.button('Pesquisar no STJ', 'stj')
 
-                except KeyError:
-                    st.error(f'Não foi encontrada a coluna **PARTES** e sim essa(s): {list(df_partes.columns)}. Remova o arquivo e envie outro com a devida coluna.')
+        if stj_button:
+            if parte == '' or parte == None:
+                st.warning('Parte não foi preenchida! ☹️')
+            elif len(tipo_de_parte) == 0:
+                st.warning('Nenhum tipo de parte selecionad(a)! ☹️')
+            else:
+                st.warning('Olha, dependendo da quantidade de processos que a parte tiver, acho melhor pegar um café e um biscoito (ou bolacha? 🤔) ☕🍪')
+                with st.expander('Execução do robô...'):
+                    try:
+                        stj = Stj(headless=True, download_files=False, parte=parte, tipo_de_parte=tipo_de_parte)
+                        stj.executa_bot()
+                        st.success('Robô finalizado!')
+                    except InvalidSessionIdException:
+                        st.warning('Ocorreu um erro inesperado, reexecute a pesquisa.')
+                try:
+                    df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
+                    st.download_button(label='📥 Baixar a Extração...',
+                                        data=df_xlsx,
+                                        file_name= 'extraction.xlsx')
+                except (FileNotFoundError, FileExistsError):
+                    st.warning('O Robô foi executado, no entanto pode ter ocorrido um erro e não existe a tabela de extração')
+
     else:
-        st.warning('Ainda em desenvolvimento...', icon='🧑‍💻')
+        st.warning('Que pena! Estamos fazendo essa parte! Quem sabe amanhã não aparece aqui esse robô... 👀👀')
+        # st.success('Você pode brincar um pouco na sessão "Games" na barra lateral esquerda...')
 
+# if CHOICE == 'Games':
+#     st.markdown('# Você quer jogar???')
+#     st.balloons()
 if CHOICE == 'Analise Dos Dados Extraidos':
     df = None
     st.warning('Ainda em Desenvolvimento...', icon='🧑‍💻')
