@@ -77,7 +77,7 @@ if CHOICE == 'Extração dos Dados':
                     df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
                     st.download_button(label='📥 Baixar a Extração...',
                                         data=df_xlsx ,
-                                        file_name= 'extraction.xlsx')
+                                        file_name=f'extraction_{parte.lower().strip()}.xlsx')
                 except (FileNotFoundError, FileExistsError):
                     st.warning('O Robô foi executado, no entanto pode ter ocorrido um erro e não existe a tabela de extração')
 
@@ -105,7 +105,7 @@ if CHOICE == 'Extração dos Dados':
                     df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
                     st.download_button(label='📥 Baixar a Extração...',
                                         data=df_xlsx,
-                                        file_name= 'extraction.xlsx')
+                                        file_name=f'extraction_{parte.lower().strip()}.xlsx')
                 except (FileNotFoundError, FileExistsError):
                     st.warning('O Robô foi executado, no entanto pode ter ocorrido um erro e não existe a tabela de extração')
 
