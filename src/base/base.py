@@ -7,8 +7,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import *
 from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core import driver
-print(driver.get_browser_version_from_os)
 from funcsforspo_l.fpython.functions_for_py import *
 from funcsforspo_l.fselenium.functions_selenium import *
 from funcsforspo_l.fregex.functions_re import *
@@ -89,7 +87,12 @@ class Bot:
         self.__service = Service(ChromeDriverManager(cache_valid_range=0, chrome_type=ChromeType.CHROMIUM).install())
         
         # create DRIVER
-        self.DRIVER = Chrome(service=self.__service, options=self._options)
+        try:
+            self.DRIVER = Chrome(service=self.__service, options=self._options)
+        except SessionNotCreatedException:
+            self.__service = Service(ChromeDriverManager(cache_valid_range=0).install())
+            self.DRIVER = Chrome(service=self.__service, options=self._options)
+
         self.WDW3 = WebDriverWait(self.DRIVER, timeout=3)
         self.WDW5 = WebDriverWait(self.DRIVER, timeout=5)
         self.WDW7 = WebDriverWait(self.DRIVER, timeout=7)
