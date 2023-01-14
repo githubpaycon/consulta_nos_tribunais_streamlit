@@ -1,4 +1,5 @@
 import pandas as pd
+from src.exceptions.exceptions import NenhumValorEncontradoStjException
 from src.app.stf import Stf
 from src.app.stj import Stj
 import streamlit as st
@@ -70,16 +71,14 @@ if CHOICE == 'Extração dos Dados':
                     try:
                         stf = Stf(True, False, parte)
                         stf.executa_bot()
+                        st.balloons()
                         st.success('Robô finalizado!')
+                        df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
+                        st.download_button(label='📥 Baixar a Extração...',
+                                            data=df_xlsx ,
+                                            file_name=f'extraction_STF_{parte.lower().strip()}.xlsx')
                     except InvalidSessionIdException:
                         st.warning('Ocorreu um erro inesperado, reexecute a pesquisa.')
-                try:
-                    df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
-                    st.download_button(label='📥 Baixar a Extração...',
-                                        data=df_xlsx ,
-                                        file_name=f'extraction_{parte.lower().strip()}.xlsx')
-                except (FileNotFoundError, FileExistsError):
-                    st.warning('O Robô foi executado, no entanto pode ter ocorrido um erro e não existe a tabela de extração')
 
     elif tribunal == 'STJ - Superior Tribunal de Justiça':
         st.markdown('<p class="p">* Insira uma parte válida!</p>', True)
@@ -93,22 +92,27 @@ if CHOICE == 'Extração dos Dados':
             elif len(tipo_de_parte) == 0:
                 st.warning('Nenhum tipo de parte selecionad(a)! ☹️')
             else:
-                st.warning('Olha, dependendo da quantidade de processos que a parte tiver, acho melhor pegar um café e um biscoito (ou bolacha? 🤔) ☕🍪')
+                st.warning('Olha, dependendo da quantidade de processos que a parte tiver, acho melhor pegar um café e uma bolacha (ou biscoito? 🤔) ☕🍪')
+                with st.expander('👀 Veja aqui... 👀'):
+                    st.snow()
+                    st.warning('Alô você!')
+                    st.warning('Gostaria de fazer pesquisas mais criteriosas, buscando por campos específicos? Com extrações de mais dados em uma única planilha Excel, e quem sabe, fazer essa extração, todo mês, ou cada semana ou ainda, todos os dias! Basta entrar em contato conosco que fazemos uma ferramenta para você! Basta entrar em contato pelo link ao lado: [Nosso WhatsApp](https://api.whatsapp.com/send?phone=5511985640273&text=Oi%20quero%20automatizar%20tarefas%20da%20minha%20empresa) 😏')
+                    
                 with st.expander('Execução do robô...'):
                     try:
-                        stj = Stj(headless=True, download_files=False, parte=parte, tipo_de_parte=tipo_de_parte)
+                        stj = Stj(headless=False, download_files=False, parte=parte, tipo_de_parte=tipo_de_parte)
                         stj.executa_bot()
+                        st.balloons()
                         st.success('Robô finalizado!')
+                        df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
+                        st.download_button(label='📥 Baixar a Extração...',
+                                            data=df_xlsx,
+                                            file_name=f'extraction_STJ_{parte.lower().strip()}.xlsx')
                     except InvalidSessionIdException:
                         st.warning('Ocorreu um erro inesperado, reexecute a pesquisa.')
-                try:
-                    df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
-                    st.download_button(label='📥 Baixar a Extração...',
-                                        data=df_xlsx,
-                                        file_name=f'extraction_{parte.lower().strip()}.xlsx')
-                except (FileNotFoundError, FileExistsError):
-                    st.warning('O Robô foi executado, no entanto pode ter ocorrido um erro e não existe a tabela de extração')
-
+                    except NenhumValorEncontradoStjException:
+                        st.warning(f'😱 Não foi possível encontrar nenhum registro para a perte informada "{parte}".')
+                        
     else:
         st.warning('Que pena! Estamos fazendo essa parte! Quem sabe amanhã não aparece aqui esse robô... 👀👀')
         # st.success('Você pode brincar um pouco na sessão "Games" na barra lateral esquerda...')

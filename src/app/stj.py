@@ -50,7 +50,10 @@ class Stj(Bot):
         espera_elemento_disponivel_e_clica(self.WDW, (By.CSS_SELECTOR, '#idBotaoPesquisarFormularioExtendido'))
         
         # Marca todos
-        espera_elemento_disponivel_e_clica(self.WDW, (By.CSS_SELECTOR, '#idBotaoMarcarTodos'))
+        try:
+            espera_elemento_disponivel_e_clica(self.WDW, (By.CSS_SELECTOR, '#idBotaoMarcarTodos'))
+        except (TimeoutException, NoSuchElementException):
+            raise NenhumValorEncontradoStjException
 
         # clica em pesquisar marcados
         espera_elemento_disponivel_e_clica(self.WDW, (By.CSS_SELECTOR, '#idBotaoPesquisarMarcados'))
