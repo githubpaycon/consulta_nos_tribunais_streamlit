@@ -1,4 +1,5 @@
 import pandas as pd
+import pytz
 from src.exceptions.exceptions import NenhumValorEncontradoStjException
 from src.app.stf import Stf
 from src.app.stj import Stj
@@ -11,6 +12,11 @@ import plotly.express as px
 
 
 # -- CONFIGURATIONS = START -- #
+# timezone = pytz.timezone('America/Sao_Paulo')
+# date = datetime.now(tz=timezone).strftime('%d/%m/%Y %H:%M:%S')
+
+VERSION_APP = f'V2.1.0'
+
 st.set_page_config(
     page_title="Consulta nos Tribunais",
     page_icon="justice.png",
@@ -19,7 +25,7 @@ st.set_page_config(
     menu_items={
         'Get Help': 'https://api.whatsapp.com/send?phone=5511985640273',
         'Report a bug': "https://api.whatsapp.com/send?phone=5511985640273",
-        'About': "#### Trabalhando por um futuro melhor (e mais automatizado) com muito amor, inteligência e vontade! [Isso é a Paycon Automation](https://payconautomacoes.com.br/)"
+        'About': f"###### Trabalhando por um futuro melhor (e mais automatizado) com muito amor, inteligência e vontade! Isso é a [Paycon Automações](https://payconautomacoes.com.br/)! | Versão: {VERSION_APP}"
     }
 )
 
