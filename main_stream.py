@@ -1,5 +1,6 @@
 import pandas as pd
 import pytz
+from src.app.tst import Tst
 from src.exceptions.exceptions import NenhumValorEncontradoStjException
 from src.app.stf import Stf
 from src.app.stj import Stj
@@ -57,13 +58,14 @@ except FileNotFoundError:
 # ================================ #
 st.image('sucess_logo_paycon.png', width=150)
 if CHOICE == 'Extração dos Dados':
-    st.markdown('# Consulta nos Tribunais')
-    st.markdown('### Faça consultas nos principais tribunais do Brasil!')
-    st.markdown('#### Tribunais disponíveis atualmente:')
+    st.title('Consulta nos Tribunais')
+    st.header('Captura de processos automaticamente nos tribunais principais tribunais do Brasil')
+    st.text('Para consultar nos tribunais, basta apenas escolher o tribunal, enviar o nome da parte e aguardar o resultado em .xlsx')
+    st.markdown('###### Tribunais disponíveis atualmente:')
     st.markdown('* STF - Supremo Tribunal Federal')
     st.markdown('* STJ - Superior Tribunal de Justiça')
     st.markdown('---')
-    tribunal = st.selectbox('Escolha o Tribunal:', ['STF - Supremo Tribunal Federal', 'STJ - Superior Tribunal de Justiça', 'TST - Tribunal Superior do Trabalho'])
+    tribunal = st.selectbox('Escolha o Tribunal:', ['STF - Supremo Tribunal Federal', 'STJ - Superior Tribunal de Justiça'])
 
     if tribunal == 'STF - Supremo Tribunal Federal':
         st.markdown('<p class="p">* Insira uma parte válida!</p>', True)
@@ -118,7 +120,39 @@ if CHOICE == 'Extração dos Dados':
                         st.warning('Ocorreu um erro inesperado, reexecute a pesquisa.')
                     except NenhumValorEncontradoStjException:
                         st.warning(f'😱 Não foi possível encontrar nenhum registro para a perte informada "{parte}".')
-                        
+    elif tribunal == 'TST - Tribunal Superior do Trabalho':
+        st.markdown('<p class="p">* Insira uma parte válida!</p>', True)
+        st.warning('Atenção: O TST geralmente fica fora do ar nas pesquisas... Não é culpa nossa. 😐')
+        parte = st.text_input('Parte:').strip()
+        tst_button = st.button('Pesquisar no TST', 'tst')
+
+        if tst_button:
+            if parte == '' or parte == None:
+                st.warning('Parte não foi preenchida! ☹️')
+            else:
+                st.warning('Olha, dependendo da quantidade de processos que a parte tiver, acho melhor pegar um café e uma bolacha (ou biscoito? 🤔) ☕🍪')
+                with st.expander('👀 Veja aqui... 👀'):
+                    st.snow()
+                    st.warning('Alô você!')
+                    st.warning('Gostaria de fazer pesquisas mais criteriosas, buscando por campos específicos? Com extrações de mais dados em uma única planilha Excel, e quem sabe, fazer essa extração, todo mês, ou cada semana ou ainda, todos os dias! Basta entrar em contato conosco que fazemos uma ferramenta para você! Basta entrar em contato pelo link ao lado: [Nosso WhatsApp](https://api.whatsapp.com/send?phone=5511985640273&text=Oi%20quero%20automatizar%20tarefas%20da%20minha%20empresa) 😏')
+                    
+                with st.expander('Execução do robô...'):
+                    try:
+                        tst = Tst(headless=False, download_files=False, parte=parte)
+                        tst.executa_bot()
+                        st.balloons()
+                        st.success('Robô finalizado!')
+                        df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
+                        st.download_button(label='📥 Baixar a Extração...',
+                                            data=df_xlsx,
+                                            file_name=f'extraction_TST_{parte.lower().strip()}.xlsx')
+                    except InvalidSessionIdException:
+                        st.warning('Ocorreu um erro inesperado, reexecute a pesquisa.')
+                    except NenhumValorEncontradoStjException:
+                        st.warning(f'😱 Não foi possível encontrar nenhum registro para a perte informada "{parte}".')
+
+    
+    
     else:
         st.warning('Que pena! Estamos fazendo essa parte! Quem sabe amanhã não aparece aqui esse robô... 👀👀')
         # st.success('Você pode brincar um pouco na sessão "Games" na barra lateral esquerda...')
