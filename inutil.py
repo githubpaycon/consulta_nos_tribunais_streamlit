@@ -1,2 +1,0 @@
-from funcsforspo_l.fpython.functions_for_py import cria_diretorios_para_novo_projeto_python
-cria_diretorios_para_novo_projeto_python()

@@ -14,3 +14,4 @@ tests.py
 .env
 .gitignore
 envs.py
+.streamlit
