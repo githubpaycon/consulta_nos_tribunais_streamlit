@@ -158,32 +158,31 @@ if CHOICE == 'Extração dos Dados':
     elif tribunal == 'TRT2 - Solicitação da Certidão Online de Ações Trabalhistas':
         st.markdown('#### Alô você! Esse bot captura todos os processos de Ações Trabalhistas no estado de São Paulo! Basta enviar o CNPJ!')
         cnpj = st.text_input('CNPJ:', help='Você pode enviar CNPJs com ou sem formatação.')
-
-        button = st.button('Procurar...')
-        if button:
+        cnpj = formata_cpf_e_cnpj(pega_somente_numeros(cnpj))
+        if cnpj:
             try:
-                cnpj = formata_cpf_e_cnpj(cnpj)
-                if cnpj:
-                    with st.expander('Execução do bot:'):
-                        TrtSCOAT(True, True, cnpj).executa_bot()
-                    st.balloons()
-                    st.success('Robô finalizado!')
-                    df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
-                    st.download_button(
-                        label='📥 Baixar a Extração...',
-                        data=df_xlsx,
-                        file_name=f'extraction_trt2_{pega_somente_numeros(cnpj).lower().strip()}.xlsx',
-                        help='Baixa uma planilha .xlsx com todos os processos em uma só coluna. Se desejar mais informações, recomendo a outra opção...')
-                    certidao = None
-                    with open(arquivo_com_caminho_absoluto('downloads', 'certidao.pdf'), 'rb') as f:
-                        certidao = f.read()
-                    st.download_button(
-                        label='📥 Baixar a Certidão...',
-                        data=certidao,
-                        file_name=f'certidao_{pega_somente_numeros(cnpj)}.pdf', 
-                        help='Baixará o PDF da certidão que foi emitida no TRT2')
-                    st.warning('Escolha uma das formas de download...')
-                    
+                button = st.button('Procurar...')
+                if button:
+                            with st.expander('Execução do bot:'):
+                                TrtSCOAT(True, True, cnpj).executa_bot()
+                            st.balloons()
+                            st.success('Robô finalizado!')
+                            df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
+                            st.download_button(
+                                label='📥 Baixar a Extração...',
+                                data=df_xlsx,
+                                file_name=f'extraction_trt2_{pega_somente_numeros(cnpj).lower().strip()}.xlsx',
+                                help='Baixa uma planilha .xlsx com todos os processos em uma só coluna. Se desejar mais informações, recomendo a outra opção...')
+                            certidao = None
+                            with open(arquivo_com_caminho_absoluto('downloads', 'certidao.pdf'), 'rb') as f:
+                                certidao = f.read()
+                            st.download_button(
+                                label='📥 Baixar a Certidão...',
+                                data=certidao,
+                                file_name=f'certidao_{pega_somente_numeros(cnpj)}.pdf', 
+                                help='Baixará o PDF da certidão que foi emitida no TRT2')
+                            st.warning('Escolha uma das formas de download...')
+                            
             except (NameError, IndexError):
                 st.error('CNPJ inválido!')
 
