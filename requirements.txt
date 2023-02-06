@@ -76,3 +76,4 @@ wsproto
 XlsxWriter
 zipp
 random-user-agent
+2captcha-python
