@@ -1,7 +1,7 @@
 from funcsforspo_l.fpython.functions_for_py import *
 from funcsforspo_l.fselenium.functions_selenium import *
-from funcsforspo_l.fpdf.focr.orc import faz_ocr_em_pdf_offline
 from src.utils.captcha.captcha import CaptchaSolver
+from src.utils.utils import faz_ocr_em_pdf_offline
 import pytz
 import os
 from src.base.base import *

@@ -1,4 +1,5 @@
 import pandas as pd
+from funcsforspo_l.fpython.functions_for_py import *
 from io import BytesIO
 
 def to_excel_for_download_button(path_df):
@@ -39,3 +40,37 @@ def verifica_colunas_stf(df: pd.DataFrame):
             break
         
     return verification
+
+
+def faz_ocr_em_pdf_offline(path_pdf: str, export_from_file_txt: str=False) -> str:
+    """Converte pdf(s) em texto com pypdf
+    
+    ### pip install pypdf
+    
+    ## Atenção, só funciona corretamente em PDF's que o texto é selecionável!
+    
+    Use:
+        ...
+    
+    Args:
+        path_pdf (str): caminho do pdf
+        export_from_file_txt (bool | str): passar um caminho de arquivo txt para o texto sair
+
+    Returns:
+        str: texto do PDF
+    """
+    
+    text = []
+    from pypdf import PdfReader
+
+    reader = PdfReader(path_pdf)
+    pages = reader.pages
+    for page in pages:
+        text.append(page.extract_text())
+    else:
+        text = transforma_lista_em_string(text)
+        
+        if export_from_file_txt:
+            with open('extraction_pdf.txt', 'w', encoding='utf-8') as f:
+                f.write(text)
+        return text
