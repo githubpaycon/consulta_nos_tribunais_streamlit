@@ -170,7 +170,7 @@ if CHOICE == 'Extração dos Dados':
                         st.download_button(
                             label='📥 Baixar a Extração...',
                             data=df_xlsx,
-                            file_name=f'extraction_trt2_{pega_somente_numeros(cnpj).lower().strip()}.xlsx',
+                            file_name=f'extraction_trt2_{cnpj}.xlsx',
                             help='Baixa uma planilha .xlsx com todos os processos em uma só coluna. Se desejar mais informações, recomendo a outra opção...')
                         certidao = None
                         with open(arquivo_com_caminho_absoluto('downloads', 'certidao.pdf'), 'rb') as f:
@@ -178,7 +178,7 @@ if CHOICE == 'Extração dos Dados':
                         st.download_button(
                             label='📥 Baixar a Certidão...',
                             data=certidao,
-                            file_name=f'certidao_{pega_somente_numeros(cnpj)}.pdf', 
+                            file_name=f'certidao_{cnpj}.pdf', 
                             help='Baixará o PDF da certidão que foi emitida no TRT2')
                         st.warning('Escolha uma das formas de download...')
                         
@@ -189,55 +189,3 @@ if CHOICE == 'Extração dos Dados':
 
     else:
         st.warning('Que pena! Estamos fazendo essa parte! Quem sabe amanhã não aparece aqui esse robô... 👀👀')
-        # st.success('Você pode brincar um pouco na sessão "Games" na barra lateral esquerda...')
-
-# if CHOICE == 'Games':
-#     st.markdown('# Você quer jogar???')
-#     st.balloons()
-if CHOICE == 'Analise Dos Dados Extraidos':
-    df = None
-    st.warning('Ainda em Desenvolvimento...', icon='🧑‍💻')
-    st.markdown('# Analise Dos Dados da Extração')
-    st.markdown('### Verifique por exemplo quantos processos estão em tramite, quais os meios, etc...')
-    
-    tribunal = st.selectbox('Tribunal que deseja anlisar os dados...', ['STF', 'TRT'])
-    if tribunal == 'STF':
-        with st.expander('Envio do arquivo...', True):
-            file = st.file_uploader('Arquivo da extração:')
-            if not file is None:
-                df = pd.read_excel(file)
-                if verifica_colunas_stf(df) == False:
-                    st.error(f"Foi encontrada alguma coluna que não faz parte da extração do STF... As colunas válidas são {transforma_lista_em_string(['PARTE', 'IDENTIFICACAO', 'NUMERO UNICO', 'DATA AUTUACAO', 'MEIO', 'PUBLICIDADE', 'TRAMITE'])}")
-                else:
-                    st.success('Prontinho, você pode recolher essa aba e ver os gráficos...')
-                    
-        with st.expander('Gráficos...'):
-            try:
-                print(df)
-                choice = st.selectbox('Escolha a forma de visualização', ['Tabela', 'Métricas', 'Pizza'])
-                if choice == 'Tabela':
-                    st.dataframe(df)
-                if choice == 'Métricas':
-                    c1, c2, c3 = st.columns(3)
-                    
-                    c1.metric('Partes Totais Encontradas', len(list(set(df['PARTE']))))
-                    c2.metric('Meio Eletrônico', len(df['PARTE'].loc[df['MEIO'] == 'Eletrônico']))
-                    c3.metric('Meio Físico', len(df['PARTE'].loc[df['MEIO'] == 'Físico']))
-                    c1.metric('Em trâmite', len(df['PARTE'].loc[df['TRAMITE'] == 'Sim']))
-                    c2.metric('Não em trâmite', len(df['PARTE'].loc[df['TRAMITE'] == 'Não']))
-                if choice == 'Pizza':
-                    st.subheader('Quantidade de processos em trâmite')
-                    values = st.selectbox('Valores', list(df.columns), index=2) # index é o default
-                    names = st.selectbox('Nomes', list(df.columns), index=1)
-                    tamanho_hole = st.slider('Tamanho do Furo', min_value=0.001, max_value=1.0)
-                    partes = st.multiselect('Partes', list(df['PARTE']), key='2', default=list(df['PARTE'])[10])
-                    if not len(partes) == 0:
-                        df = df.loc[df['PARTE'].isin(partes)]
-
-                    fig = px.pie(df, values=values, names=names, hole=tamanho_hole) 
-                    st.plotly_chart(fig, True)
-
-            except Exception as e:
-                print(e)
-                print(repr(e))
-                st.warning('Arquivo ainda não enviado...')
