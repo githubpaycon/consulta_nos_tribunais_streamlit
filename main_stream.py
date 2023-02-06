@@ -184,8 +184,7 @@ if CHOICE == 'Extração dos Dados':
                         
         except IndexError:
             st.error('CNPJ não preenchido!')
-        except NameError:
-            st.error('CNPJ Inválido')
+
 
     else:
         st.warning('Que pena! Estamos fazendo essa parte! Quem sabe amanhã não aparece aqui esse robô... 👀👀')
