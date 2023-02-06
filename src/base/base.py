@@ -84,7 +84,7 @@ class Bot:
         self._options.add_argument('–disable-notifications')
         self._options.add_argument("--window-size=1920,1080")
         
-        self.__service = Service(ChromeDriverManager(cache_valid_range=0, chrome_type=ChromeType.CHROMIUM).install())
+        self.__service = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
         
         # create DRIVER
         try:
@@ -98,6 +98,7 @@ class Bot:
         self.WDW7 = WebDriverWait(self.DRIVER, timeout=7)
         self.WDW10 = WebDriverWait(self.DRIVER, timeout=10)
         self.WDW30 = WebDriverWait(self.DRIVER, timeout=30)
+        self.WDW120 = WebDriverWait(self.DRIVER, timeout=120)
         self.WDW = self.WDW7
 
         self.DRIVER.maximize_window()

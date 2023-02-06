@@ -75,3 +75,4 @@ wget
 wsproto
 XlsxWriter
 zipp
+random-user-agent

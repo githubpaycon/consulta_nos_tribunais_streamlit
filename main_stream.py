@@ -1,5 +1,6 @@
 import pandas as pd
 import pytz
+from src.app.trt.trt2 import TrtSCOAT
 from src.app.tst import Tst
 from src.exceptions.exceptions import NenhumValorEncontradoStjException
 from src.app.stf import Stf
@@ -7,6 +8,7 @@ from src.app.stj import Stj
 import streamlit as st
 from src.base.base import InvalidSessionIdException
 import os
+from funcsforspo_l.fregex.functions_re import *
 from funcsforspo_l.fpython.functions_for_py import *
 from src.utils.utils import to_excel_for_download_button, verifica_colunas_stf
 import plotly.express as px
@@ -16,7 +18,7 @@ import plotly.express as px
 # timezone = pytz.timezone('America/Sao_Paulo')
 # date = datetime.now(tz=timezone).strftime('%d/%m/%Y %H:%M:%S')
 
-VERSION_APP = f'V2.1.0'
+VERSION_APP = f'V3.0.0'
 
 st.set_page_config(
     page_title="Consulta nos Tribunais",
@@ -46,12 +48,13 @@ CHOICE = bar.selectbox('Escolha uma Ferramenta', ['Extração dos Dados']) # , '
 # -- DELETE EXTRACTION --
 try:
     os.remove('EXTRACAO.xlsx')
-except FileNotFoundError:
+except Exception:
     pass
 # -- DELETE EXTRACTION --
 
 # -- CONFIGURATIONS = END-- #
 
+# TrtSCOAT(False, True, '40.432.544/0001-47').executa_bot()
 
 # ================================ #
 # ====== EXTRAÇÃO DOS DADOS ====== #
@@ -64,8 +67,9 @@ if CHOICE == 'Extração dos Dados':
     st.markdown('###### Tribunais disponíveis atualmente:')
     st.markdown('* STF - Supremo Tribunal Federal')
     st.markdown('* STJ - Superior Tribunal de Justiça')
+    st.markdown('* TRT2 - Solicitação de Ações Trabalhistas')
     st.markdown('---')
-    tribunal = st.selectbox('Escolha o Tribunal:', ['STF - Supremo Tribunal Federal', 'STJ - Superior Tribunal de Justiça'])
+    tribunal = st.selectbox('Escolha o Tribunal:', ['STF - Supremo Tribunal Federal', 'STJ - Superior Tribunal de Justiça', 'TRT2 - Solicitação da Certidão Online de Ações Trabalhistas'])
 
     if tribunal == 'STF - Supremo Tribunal Federal':
         st.markdown('<p class="p">* Insira uma parte válida!</p>', True)
@@ -120,6 +124,7 @@ if CHOICE == 'Extração dos Dados':
                         st.warning('Ocorreu um erro inesperado, reexecute a pesquisa.')
                     except NenhumValorEncontradoStjException:
                         st.warning(f'😱 Não foi possível encontrar nenhum registro para a perte informada "{parte}".')
+
     elif tribunal == 'TST - Tribunal Superior do Trabalho':
         st.markdown('<p class="p">* Insira uma parte válida!</p>', True)
         st.warning('Atenção: O TST geralmente fica fora do ar nas pesquisas... Não é culpa nossa. 😐')
@@ -150,9 +155,38 @@ if CHOICE == 'Extração dos Dados':
                         st.warning('Ocorreu um erro inesperado, reexecute a pesquisa.')
                     except NenhumValorEncontradoStjException:
                         st.warning(f'😱 Não foi possível encontrar nenhum registro para a perte informada "{parte}".')
+    elif tribunal == 'TRT2 - Solicitação da Certidão Online de Ações Trabalhistas':
+        st.markdown('#### Alô você! Esse bot captura todos os processos de Ações Trabalhistas no estado de São Paulo! Basta enviar o CNPJ!')
+        cnpj = st.text_input('CNPJ:', help='Você pode enviar CNPJs com ou sem formatação.')
 
-    
-    
+        button = st.button('Procurar...')
+        if button:
+            try:
+                cnpj = formata_cpf_e_cnpj(cnpj)
+                if cnpj:
+                    with st.expander('Execução do bot:'):
+                        TrtSCOAT(True, True, cnpj).executa_bot()
+                    st.balloons()
+                    st.success('Robô finalizado!')
+                    df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
+                    st.download_button(
+                        label='📥 Baixar a Extração...',
+                        data=df_xlsx,
+                        file_name=f'extraction_trt2_{pega_somente_numeros(cnpj).lower().strip()}.xlsx',
+                        help='Baixa uma planilha .xlsx com todos os processos em uma só coluna. Se desejar mais informações, recomendo a outra opção...')
+                    certidao = None
+                    with open(arquivo_com_caminho_absoluto('downloads', 'certidao.pdf'), 'rb') as f:
+                        certidao = f.read()
+                    st.download_button(
+                        label='📥 Baixar a Certidão...',
+                        data=certidao,
+                        file_name=f'certidao_{pega_somente_numeros(cnpj)}.pdf', 
+                        help='Baixará o PDF da certidão que foi emitida no TRT2')
+                    st.warning('Escolha uma das formas de download...')
+                    
+            except (NameError, IndexError):
+                st.error('CNPJ inválido!')
+
     else:
         st.warning('Que pena! Estamos fazendo essa parte! Quem sabe amanhã não aparece aqui esse robô... 👀👀')
         # st.success('Você pode brincar um pouco na sessão "Games" na barra lateral esquerda...')

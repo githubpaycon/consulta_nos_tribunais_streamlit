@@ -8,3 +8,9 @@ pesquisa_stj_package
 pesquisa_tst_package
 base
 bin
+testopenai.py
+tests.py
+.streamlit/secrets.toml
+.env
+.gitignore
+envs.py
