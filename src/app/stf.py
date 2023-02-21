@@ -22,22 +22,29 @@ class Stf(Bot):
         super().__init__(headless, download_files)
         
     def pesquisa(self):
-        if isinstance(self.PARTES, list):
-            for parte in self.PARTES:
-                faz_log_st(f'Pesquisando pela parte {parte}')
-                try:
-                    self.DRIVER.get(f'{self.URL_CLEAR}{parte}')
-                except WebDriverException:
-                    faz_log_st('Ocorreu um erro no Driver, pesquise novamente...')
-                    self.DRIVER.close()
-                # -- RECUPERA OS DADOS -- #
+        if isinstance(self.PARTES, str):
+            parte = self.PARTES
+            faz_log_st(f'Pesquisando pela parte {parte}')
+            try:
+                self.DRIVER.get(f'{self.URL_CLEAR}{parte}')
+            except WebDriverException:
+                faz_log_st('Ocorreu um erro no Driver, pesquise novamente...')
+                self.DRIVER.close()
+            
+            # -- RECUPERA OS DADOS -- #
+            try:
+                espera_elemento(self.WDW3, (By.CSS_SELECTOR, 'div[class*="conteudo-404"]'))
+                faz_log_st('Não existem processos!')
+                self.DRIVER.close()
+                return
+            except TimeoutException:
                 try:
                     page_atual = espera_e_retorna_conteudo_do_atributo_do_elemento_text(self.WDW, 'data-pagina', (By.CSS_SELECTOR, 'a[class="paginacao-ir-para-pagina"]'))
                     qtd_processos = espera_e_retorna_elemento_text(self.WDW, (By.CSS_SELECTOR, '#quantidade'))
                     faz_log_st(f'Quantidade de Processos {qtd_processos}')
 
                     processos_pagination = True
-                    
+
                     for i in range(20):
                         self.DRIVER.find_element(By.CSS_SELECTOR, 'body').send_keys(Keys.PAGE_DOWN)
                     for i in range(20):
@@ -48,7 +55,6 @@ class Stf(Bot):
                     while processos_pagination:
                         faz_log_st(f'Pagina atual {page_atual}')
                         for processo in processos:
-                            faz_log_st('recuperando dados...')
                             identificacao = processo.find_element(By.CSS_SELECTOR, 'div >h6>span').text
                             num_unico = processo.find_element(By.CSS_SELECTOR, 'div >h6~h6>span').text
                             parte = processo.find_element(By.CSS_SELECTOR, 'div[class="item__descricao item__partes"]').text
@@ -65,6 +71,7 @@ class Stf(Bot):
                             self.publicidade_col.append(publicidade)
                             self.tramite_col.append(tramite)
                         else:
+                            faz_log_st('Verificando se tem mais paginas...')
                             for i in range(20):
                                 self.DRIVER.find_element(By.CSS_SELECTOR, 'body').send_keys(Keys.PAGE_DOWN)
 
@@ -76,9 +83,7 @@ class Stf(Bot):
                             else:
                                 faz_log_st('Sem mais processos nessa parte...')
                                 processos_pagination = False
-                            
-                        
-                    # -- RECUPERA OS DADOS -- #
+                        # -- RECUPERA OS DADOS -- #
                 except (TimeoutException, NoSuchElementException):
                     faz_log_st(self.DRIVER.get_screenshot_as_base64())
                     faz_log_st(self.DRIVER.page_source)
@@ -91,80 +96,9 @@ class Stf(Bot):
                     self.publicidade_col.append('Não existe processos para a parte - ou o site está fora do ar...')
                     self.tramite_col.append('Não existe processos para a parte - ou o site está fora do ar...')
                 except Exception as e:
-                    faz_log_st(self.DRIVER.get_screenshot_as_base64())
-                    faz_log_st(self.DRIVER.page_source)
-                    st.exception(e) 
-        if isinstance(self.PARTES, str):
-            parte = self.PARTES
-            faz_log_st(f'Pesquisando pela parte {parte}')
-            try:
-                self.DRIVER.get(f'{self.URL_CLEAR}{parte}')
-            except WebDriverException:
-                faz_log_st('Ocorreu um erro no Driver, pesquise novamente...')
-                self.DRIVER.close()
-            
-            # -- RECUPERA OS DADOS -- #
-            try:
-                page_atual = espera_e_retorna_conteudo_do_atributo_do_elemento_text(self.WDW, 'data-pagina', (By.CSS_SELECTOR, 'a[class="paginacao-ir-para-pagina"]'))
-                qtd_processos = espera_e_retorna_elemento_text(self.WDW, (By.CSS_SELECTOR, '#quantidade'))
-                faz_log_st(f'Quantidade de Processos {qtd_processos}')
-
-                processos_pagination = True
-
-                for i in range(20):
-                    self.DRIVER.find_element(By.CSS_SELECTOR, 'body').send_keys(Keys.PAGE_DOWN)
-                for i in range(20):
-                    self.DRIVER.find_element(By.CSS_SELECTOR, 'body').send_keys(Keys.PAGE_UP)
-
-
-                processos = espera_e_retorna_lista_de_elementos(self.WDW, (By.CSS_SELECTOR, '#card_processos>div'))
-                while processos_pagination:
-                    faz_log_st(f'Pagina atual {page_atual}')
-                    for processo in processos:
-                        identificacao = processo.find_element(By.CSS_SELECTOR, 'div >h6>span').text
-                        num_unico = processo.find_element(By.CSS_SELECTOR, 'div >h6~h6>span').text
-                        parte = processo.find_element(By.CSS_SELECTOR, 'div[class="item__descricao item__partes"]').text
-                        data_autuacao = processo.find_element(By.CSS_SELECTOR, 'div~div>div>div~div>div~div[class="item__descricao"]').text
-                        meio = processo.find_element(By.CSS_SELECTOR, 'div~div>div>div~div~div>div~div[class="item__descricao"]').text
-                        publicidade = processo.find_element(By.CSS_SELECTOR, 'div~div>div>div~div~div~div>div~div[class="item__descricao"]').text
-                        tramite = processo.find_element(By.CSS_SELECTOR, 'div~div>div>div~div~div~div~div>div~div[class="item__descricao"]').text
-
-                        self.identificacao_col.append(identificacao)
-                        self.num_unico_col.append(num_unico)
-                        self.parte_col.append(parte)
-                        self.data_autuacao_col.append(data_autuacao)
-                        self.meio_col.append(meio)
-                        self.publicidade_col.append(publicidade)
-                        self.tramite_col.append(tramite)
-                    else:
-                        faz_log_st('Verificando se tem mais paginas...')
-                        for i in range(20):
-                            self.DRIVER.find_element(By.CSS_SELECTOR, 'body').send_keys(Keys.PAGE_DOWN)
-
-                        botao_next_ativo = espera_e_retorna_conteudo_do_atributo_do_elemento_text(self.WDW, 'class', (By.CSS_SELECTOR, '#item-proxima-pagina'))
-                        if not botao_next_ativo == 'disabled':
-                            espera_elemento_disponivel_e_clica(self.WDW, (By.CSS_SELECTOR, '#paginacao-proxima-pagina'))
-                            processos = espera_e_retorna_lista_de_elementos(self.WDW, (By.CSS_SELECTOR, '#card_processos>div'))
-                            page_atual = espera_e_retorna_conteudo_do_atributo_do_elemento_text(self.WDW, 'data-pagina', (By.CSS_SELECTOR, 'a[class="paginacao-ir-para-pagina"]'))
-                        else:
-                            faz_log_st('Sem mais processos nessa parte...')
-                            processos_pagination = False
-                    # -- RECUPERA OS DADOS -- #
-            except (TimeoutException, NoSuchElementException):
-                faz_log_st(self.DRIVER.get_screenshot_as_base64())
-                faz_log_st(self.DRIVER.page_source)
-                faz_log_st('Não existe processos para a parte - ou o site está fora do ar...')
-                self.identificacao_col.append('Não existe processos para a parte - ou o site está fora do ar...')
-                self.num_unico_col.append('Não existe processos para a parte - ou o site está fora do ar...')
-                self.parte_col.append(parte)
-                self.data_autuacao_col.append('Não existe processos para a parte - ou o site está fora do ar...')
-                self.meio_col.append('Não existe processos para a parte - ou o site está fora do ar...')
-                self.publicidade_col.append('Não existe processos para a parte - ou o site está fora do ar...')
-                self.tramite_col.append('Não existe processos para a parte - ou o site está fora do ar...')
-            except Exception as e:
-                    faz_log_st(self.DRIVER.get_screenshot_as_base64())
-                    faz_log_st(self.DRIVER.page_source)
-                    st.exception(e) 
+                        faz_log_st(self.DRIVER.get_screenshot_as_base64())
+                        faz_log_st(self.DRIVER.page_source)
+                        st.exception(e) 
         
     def faz_dataframe(self):
         faz_log_st('Fazendo tabela excel...')

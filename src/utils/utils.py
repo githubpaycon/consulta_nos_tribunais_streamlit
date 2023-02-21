@@ -1,3 +1,4 @@
+import base64
 import pandas as pd
 from funcsforspo_l.fpython.functions_for_py import *
 from io import BytesIO
@@ -74,3 +75,20 @@ def faz_ocr_em_pdf_offline(path_pdf: str, export_from_file_txt: str=False) -> st
             with open('extraction_pdf.txt', 'w', encoding='utf-8') as f:
                 f.write(text)
         return text
+    
+    
+def download_image_base64(base64_image, filename):
+    """Escreve uma imagem em base64
+
+    Args:
+        base64_image (base64): imagem em base64
+        filename (str): nome do arquivo, DEVE VIR COM .JPG
+        
+    Use:
+        >>> image = driver.get_screenshot_as_base64()  # driver from selenium!
+        >>> download_image_base64(image, 'myimage.jpg')
+        
+    """
+    imgdata = base64.b64decode(base64_image.replace('data:image/png;base64,', ''))
+    with open(filename, 'wb') as f:
+        f.write(imgdata)

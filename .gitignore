@@ -15,3 +15,7 @@ tests.py
 .gitignore
 envs.py
 .streamlit
+extracao.zip
+trash.json
+tests2.py
+.vscode/launch.json

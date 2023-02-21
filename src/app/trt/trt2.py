@@ -1,9 +1,3 @@
-from funcsforspo_l.fpython.functions_for_py import *
-from funcsforspo_l.fselenium.functions_selenium import *
-from src.utils.captcha.captcha import CaptchaSolver
-from src.utils.utils import faz_ocr_em_pdf_offline
-import pytz
-import os
 from src.base.base import *
 
 class TrtSCOAT(Bot):
@@ -42,30 +36,27 @@ class TrtSCOAT(Bot):
                     break
 
             espera_elemento_disponivel_e_clica(self.WDW120, (By.CSS_SELECTOR, '#main-content button'))
-            if verifica_se_baixou_o_arquivo('downloads', '.pdf'):
-                file = arquivos_com_caminho_absoluto_do_arquivo('downloads')[0]
-                dados = faz_ocr_em_pdf_offline(path_pdf=file)
-                processos = re.findall(r'\d{20}', string=dados)
-                qtd_processos = re.findall(r'Total de Processos: \d+', dados)
-                qtd_processos = qtd_processos[-1]
-                faz_log_st(qtd_processos)
-                for i in processos:
-                    self.processos.append(str(i))
+            verifica_se_baixou_o_arquivo('downloads', '.pdf', sleep_time=0)
+            os.replace(arquivos_com_caminho_absoluto_do_arquivo(DOWNLOAD_DIR)[0], arquivo_com_caminho_absoluto('output', 'certidao_trt2.pdf'))
+
             
-    def faz_dataframe(self):
-        faz_log_st('Fazendo tabela excel...')
-        dict_df = {
-            'PROCESSOS': self.processos
-        }
-        df = pd.DataFrame(dict_df)
-        try:
-            df.to_excel('EXTRACAO.xlsx', sheet_name=datetime.now(pytz.timezone('America/Sao_Paulo')).strftime("%d.%m.%Y %H_%M_%S"), index=False)
-        except PermissionError:
-            faz_log_st('Feche a tabela, aguardando 10 segundos...')
-            sleep(10)
-            df.to_excel('EXTRACAO.xlsx', sheet_name=datetime.now(pytz.timezone('America/Sao_Paulo')).strftime("%d.%m.%Y %H_%M_%S"), index=False)
-        self.DRIVER.close()
+    # def faz_dataframe(self):
+    #     faz_log_st('Fazendo tabela excel...')
+    #     dict_df = {
+    #         'PROCESSOS': self.processos
+    #     }
+    #     df = pd.DataFrame(dict_df)
+    #     try:
+    #         df.to_excel('EXTRACAO.xlsx', sheet_name=datetime.now(pytz.timezone('America/Sao_Paulo')).strftime("%d.%m.%Y %H_%M_%S"), index=False)
+    #     except PermissionError:
+    #         faz_log_st('Feche a tabela, aguardando 10 segundos...')
+    #         sleep(10)
+    #         df.to_excel('EXTRACAO.xlsx', sheet_name=datetime.now(pytz.timezone('America/Sao_Paulo')).strftime("%d.%m.%Y %H_%M_%S"), index=False)
+    #     self.DRIVER.close()
 
     def executa_bot(self):
-        self.pesquisa()
-        self.faz_dataframe()
+        try:
+            self.pesquisa()
+        except Exception as e:
+            st.exception(e)
+            self.DRIVER.close()

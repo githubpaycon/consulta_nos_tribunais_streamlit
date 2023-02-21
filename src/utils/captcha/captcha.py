@@ -13,6 +13,16 @@ class CaptchaSolver:
                                     'type': 'image',
                                     'content': image_for_2captcha
                                 }
+                                
+        image type: {
+                        'type': 'image',
+                        'content': image_for_2captcha
+                    }
+                    
+        recaptcha -> 2captcha: {
+                        'type': '2captcha',
+                        'sitekey': 6LeIxboZAAAAAFQy7d8GPzgRZu2bV0GwKS8ue_cH,
+                    }
 
         Returns:
             bool: False if exception or str for captcha
@@ -63,3 +73,15 @@ class CaptchaSolver:
                     faz_log('Erro no TwoCaptcha, verifique o Log.')
             except NetworkException:
                 return False
+        if type_captcha['type'] == '2captcha':
+            try:
+                balance = solver.balance()
+                faz_log(formata_para_real(balance))
+                # result = solver.recaptcha(sitekey=type_captcha['sitekey'], url='https://2captcha.com/demo/recaptcha-v2', )
+                result = solver.recaptcha(sitekey=type_captcha['sitekey'], url='https://pje.trt4.jus.br/certidoes/trabalhista/emissao', )
+                if isinstance(result['code'], str):
+                    return result['code']
+                else:
+                    return False
+            except ApiException as e:
+                e = str(e)
