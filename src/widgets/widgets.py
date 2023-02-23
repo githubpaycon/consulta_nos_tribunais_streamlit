@@ -9,7 +9,7 @@ from src.app.tst import *
 from src.utils.utils import to_excel_for_download_button
 import requests
 import openai
-from openai.error import AuthenticationError
+from openai.error import AuthenticationError, APIError
 
 # TST #
 def tst_widget():
@@ -141,7 +141,6 @@ def captura_de_processos_trabalhistas_widget():
         except IndexError:
             st.error('CNPJ não preenchido!')
 
-
 ## OPENAI SECTION ##
 def conversar_com_ia():
     st.markdown('# Converse com o ChatGPT!')
@@ -162,6 +161,7 @@ def conversar_com_ia():
         pass
     else:
         temperature = st.slider('Nível de Criatividade:', value=1.0, min_value=0.0, max_value=2.0, step=0.1, help='Quanto maior o nível de criatividade, maior a chance de uma resposta vir com problemas, e quanto menor o nível, maior a recionalidade da IA.')
+        max_tokens = st.slider('Limite de Palavras:', value=1000, min_value=1, max_value=2000, step=1, help='Quanto maior o limite de palavras, maior virá a mensagem.')
         prompt_insert = st.text_input('Sua mensagem para a IA:', help='Se quiser um texto bem formatado, basta enviar no final "em markdown"')
         go = st.button('Enviar')
         if go:
@@ -174,7 +174,7 @@ def conversar_com_ia():
                 response = openai.Completion.create(
                     prompt=prompt,
                     model=model_engine,
-                    max_tokens=1000,
+                    max_tokens=int(max_tokens),
                     temperature=temperature,
                     n=1,
                     # stop=['---']
@@ -187,7 +187,8 @@ def conversar_com_ia():
                 st.markdown(result_final)
             except AuthenticationError:
                 st.error('A chave de API enviada não é válida, tente outra...', icon='🗝️')
-
+            except APIError:
+                st.warning('Oh não! O servidor da OpenAI não está funcionando agora. Isso não é culpa nossa. Tente novamente um pouco mais tarde!', icon='☠️')
 
 ## API RECEITA ## 
 def consulta_cnpj():
@@ -258,6 +259,3 @@ def consulta_cnpj():
             st.text(atividade_principal)
             st.text(atividade_principal)
             st.text(atividade_principal)
-
-
-
