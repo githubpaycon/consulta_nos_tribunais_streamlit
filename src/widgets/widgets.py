@@ -86,18 +86,17 @@ def stf_widget():
         if parte == '':
             st.warning('Parte não foi preenchida! ☹️')
         else:
-            with st.expander('Execução do robô...'):
-                try:
-                    stf = Stf(True, False, parte)
-                    stf.executa_bot()
-                    st.balloons()
-                    st.success('Robô finalizado!')
-                    df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
-                    st.download_button(label='📥 Baixar a Extração...',
-                                        data=df_xlsx ,
-                                        file_name=f'extraction_STF_{parte.lower().strip()}.xlsx')
-                except InvalidSessionIdException:
-                    st.warning('Ocorreu um erro inesperado, reexecute a pesquisa.')
+            try:
+                stf = Stf(parte)
+                stf.executa_bot()
+                st.balloons()
+                st.success('Robô finalizado!')
+                df_xlsx = to_excel_for_download_button('EXTRACAO.xlsx')
+                st.download_button(label='📥 Baixar a Extração...',
+                                    data=df_xlsx ,
+                                    file_name=f'extraction_STF_{parte.lower().strip()}.xlsx')
+            except InvalidSessionIdException:
+                st.warning('Ocorreu um erro inesperado, reexecute a pesquisa.')
 
 # TRTs #
 def captura_de_processos_trabalhistas_widget():
